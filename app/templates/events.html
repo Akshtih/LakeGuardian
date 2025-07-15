@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}Cleanup Events - LakeGuardian{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Cleanup Events</h1>
+<p>Join a community cleanup event to help restore our local lakes and water bodies.</p>
+
+<div class="row">
+    {% for event in events %}
+    <div class="col-lg-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-success text-white">
+                <h5 class="card-title mb-0">{{ event.title }}</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-flex justify-content-between mb-3">
+                    <span class="badge bg-info">{{ lakes[event.lake_id] }}</span>
+                    <span class="badge bg-warning text-dark">
+                        {{ event.date.strftime('%B %d, %Y') }} at {{ event.start_time }}
+                    </span>
+                </div>
+                
+                <p>{{ event.description }}</p>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <h6>Details</h6>
+                        <ul class="list-unstyled">
+                            <li><strong>Duration:</strong> {{ event.duration }} hours</li>
+                            <li><strong>Meeting Point:</strong> {{ event.meeting_point }}</li>
+                            <li><strong>Organizer:</strong> {{ event.organizer }}</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Equipment</h6>
+                        <div class="row">
+                            <div class="col-6">
+                                <p class="mb-1"><strong>Provided:</strong></p>
+                                <ul class="small">
+                                    {% for item in event.equipment_provided %}
+                                        <li>{{ item }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            <div class="col-6">
+                                <p class="mb-1"><strong>Bring:</strong></p>
+                                <ul class="small">
+                                    {% for item in event.equipment_to_bring %}
+                                        <li>{{ item }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-between align-items-end">
+                    <div>
+                        <span class="text-muted">Spots available: {{ event.max_participants - event.participants|length }}/{{ event.max_participants }}</span>
+                        <div class="progress mt-1" style="height: 5px; width: 200px;">
+                            <div class="progress-bar" role="progressbar" 
+                                style="width: {{ ((event.participants|length / event.max_participants) * 100)|int }}%"></div>
+                        </div>
+                    </div>
+                    <form method="POST" action="{{ url_for('join_cleanup_event', event_id=event.id) }}">
+                        <button type="submit" class="btn btn-success" 
+                            {% if current_user.id in event.participants or event.participants|length >= event.max_participants %}disabled{% endif %}>
+                            {% if current_user.id in event.participants %}
+                                Already Joined
+                            {% elif event.participants|length >= event.max_participants %}
+                                Event Full
+                            {% else %}
+                                Join Event
+                            {% endif %}
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,226 @@
+{% extends "base.html" %}
+
+{% block title %}Lake Education - LakeGuardian{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8">
+        <h1 class="mb-4">Lake Conservation Education</h1>
+        <p class="lead">Learn how to protect our water bodies and get personalized advice from our AI conservation assistant.</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Ask the Lake Conservation Assistant</h5>
+            </div>
+            <div class="card-body">
+                <div id="chat-container">
+                    <div id="chat-messages" class="mb-3">
+                        <div class="message assistant">
+                            Hello! I'm your Lake Conservation Assistant. Ask me anything about lake pollution, conservation efforts, or how you can help protect our lake ecosystems!
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <input type="text" id="user-input" class="form-control" placeholder="Ask about lake conservation...">
+                        <button class="btn btn-primary" type="button" id="send-button">Send</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">Suggested Topics</h5>
+            </div>
+            <div class="card-body">
+                <div class="list-group">
+                    <button class="list-group-item list-group-item-action topic">How does plastic affect lake ecosystems?</button>
+                    <button class="list-group-item list-group-item-action topic">What are the most harmful types of lake pollution?</button>
+                    <button class="list-group-item list-group-item-action topic">How long does it take for different materials to decompose in water?</button>
+                    <button class="list-group-item list-group-item-action topic">What can students do to help prevent lake pollution?</button>
+                    <button class="list-group-item list-group-item-action topic">How can we organize an effective lake cleanup?</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">Quick Resources</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <a href="{{ url_for('events') }}" class="text-decoration-none">Join a Cleanup Event</a>
+                        <span class="badge bg-primary rounded-pill">→</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <a href="{{ url_for('report') }}" class="text-decoration-none">Report Pollution</a>
+                        <span class="badge bg-primary rounded-pill">→</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <a href="{{ url_for('dashboard') }}" class="text-decoration-none">View Lakes Dashboard</a>
+                        <span class="badge bg-primary rounded-pill">→</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<style>
+    #chat-container {
+        max-width: 100%;
+    }
+    
+    #chat-messages {
+        height: 400px;
+        overflow-y: auto;
+        border: 1px solid #dee2e6;
+        border-radius: 5px;
+        padding: 15px;
+        background-color: #f8f9fa;
+    }
+    
+    .message {
+        padding: 10px 15px;
+        border-radius: 18px;
+        margin-bottom: 10px;
+        max-width: 85%;
+        word-break: break-word;
+    }
+    
+    .message.user {
+        background-color: #d4edda;
+        margin-left: auto;
+    }
+    
+    .message.assistant {
+        background-color: #e9ecef;
+    }
+    
+    .message.typing {
+        background-color: #e9ecef;
+        animation: pulse 1.5s infinite;
+    }
+    
+    @keyframes pulse {
+        0% { opacity: 0.6; }
+        50% { opacity: 1; }
+        100% { opacity: 0.6; }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const chatMessages = document.getElementById('chat-messages');
+        const userInput = document.getElementById('user-input');
+        const sendButton = document.getElementById('send-button');
+        const topicButtons = document.querySelectorAll('.topic');
+        
+        // Function to add a new message to the chat
+        function addMessage(text, sender) {
+            const messageDiv = document.createElement('div');
+            // FIX: Adding classes separately instead of with spaces
+            messageDiv.classList.add('message');
+            messageDiv.classList.add(sender);
+            
+            // Add 'typing' class separately if sender includes 'typing'
+            if (sender === 'assistant-typing') {
+                messageDiv.classList.add('typing');
+            }
+            
+            messageDiv.textContent = text;
+            chatMessages.appendChild(messageDiv);
+            
+            // Scroll to bottom of chat
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            
+            return messageDiv;
+        }
+        
+        // Function to send message and get response
+        function sendMessage(message) {
+            if (!message.trim()) return;
+            
+            // Add user message
+            addMessage(message, 'user');
+            
+            // Clear input field
+            userInput.value = '';
+            
+            // Show "typing" indicator
+            const typingIndicator = addMessage('Thinking...', 'assistant-typing');
+            
+            console.log('Sending message to /ask endpoint:', message); // Debug log
+            
+            // Send request to server
+            fetch('/ask', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ question: message }),
+            })
+            .then(response => {
+                console.log('Response status:', response.status); // Debug log
+                return response.json();
+            })
+            .then(data => {
+                console.log('Response data:', data); // Debug log
+                
+                // Remove typing indicator
+                typingIndicator.remove();
+                
+                // Add assistant response
+                addMessage(data.answer || data.error || 'No response received', 'assistant');
+            })
+            .catch(error => {
+                console.error('Error:', error); // Debug log
+                
+                // Remove typing indicator
+                typingIndicator.remove();
+                
+                // Add error message
+                addMessage('Sorry, I had trouble responding. Please check the browser console for details.', 'assistant');
+            });
+        }
+        
+        // Send button event listener
+        sendButton.addEventListener('click', () => {
+            sendMessage(userInput.value);
+        });
+        
+        // Enter key event listener
+        userInput.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                sendMessage(userInput.value);
+            }
+        });
+        
+        // Topic button event listeners
+        topicButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                sendMessage(button.textContent);
+            });
+        });
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        
+        if (darkModeToggle) {
+            darkModeToggle.addEventListener('click', function() {
+                // If you need to make any specific changes to the chat UI when dark mode changes
+                // You can add that code here
+            });
+        }
+    });
+</script>
+{% endblock %}

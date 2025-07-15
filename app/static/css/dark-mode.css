@@ -1,0 +1,179 @@
+/* Dark Mode Styles */
+body.dark-mode {
+    background-color: #121212;
+    color: #e0e0e0;
+}
+
+.dark-mode .navbar {
+    background-color: #1a1a1a !important;
+}
+
+.dark-mode .card {
+    background-color: #1e1e1e;
+    border-color: #2d2d2d;
+}
+
+.dark-mode .card-header {
+    background-color: #2d2d2d;
+    border-color: #2d2d2d;
+}
+
+.dark-mode .card-header.bg-primary {
+    background-color: #004a77 !important;
+}
+
+.dark-mode .card-header.bg-success {
+    background-color: #155724 !important;
+}
+
+.dark-mode .card-header.bg-warning {
+    background-color: #856404 !important;
+    color: #fff !important;
+}
+
+.dark-mode .card-header.bg-info {
+    background-color: #0c5460 !important;
+}
+
+.dark-mode .list-group-item {
+    background-color: #2a2a2a;
+    border-color: #3a3a3a;
+    color: #e0e0e0;
+}
+
+.dark-mode .btn-outline-primary {
+    color: #8bb9fe;
+    border-color: #8bb9fe;
+}
+
+.dark-mode .btn-outline-secondary {
+    color: #a0a0a0;
+    border-color: #a0a0a0;
+}
+
+.dark-mode .btn-outline-success {
+    color: #7dd17d;
+    border-color: #7dd17d;
+}
+
+.dark-mode .btn-outline-warning {
+    color: #ffda6a;
+    border-color: #ffda6a;
+}
+
+.dark-mode .btn-outline-info {
+    color: #8be0f4;
+    border-color: #8be0f4;
+}
+
+.dark-mode .btn-outline-danger {
+    color: #f1aeb5;
+    border-color: #f1aeb5;
+}
+
+.dark-mode .form-control {
+    background-color: #333;
+    border-color: #444;
+    color: #e0e0e0;
+}
+
+.dark-mode .form-control:focus {
+    background-color: #3a3a3a;
+    color: #e0e0e0;
+}
+
+.dark-mode .table {
+    color: #e0e0e0;
+}
+
+.dark-mode .table-hover tbody tr:hover {
+    background-color: #2a2a2a;
+}
+
+.dark-mode .footer {
+    background-color: #1a1a1a !important;
+    color: #a0a0a0;
+}
+
+.dark-mode .text-muted {
+    color: #a0a0a0 !important;
+}
+
+.dark-mode .alert-success {
+    background-color: #0d3b0d;
+    border-color: #0f450f;
+    color: #7dd17d;
+}
+
+.dark-mode .alert-danger {
+    background-color: #3b0d0d;
+    border-color: #450f0f;
+    color: #f1aeb5;
+}
+
+.dark-mode .alert-warning {
+    background-color: #3b2e0d;
+    border-color: #45360f;
+    color: #ffda6a;
+}
+
+.dark-mode .alert-info {
+    background-color: #0d303b;
+    border-color: #0f3845;
+    color: #8be0f4;
+}
+
+/* Dark mode for chat UI */
+.dark-mode #chat-messages {
+    background-color: #1e1e1e;
+    border-color: #2d2d2d;
+}
+
+.dark-mode .message.user {
+    background-color: #0d3b0d;
+    color: #e0e0e0;
+}
+
+.dark-mode .message.assistant {
+    background-color: #2a2a2a;
+    color: #e0e0e0;
+}
+
+/* Dark mode for map */
+.dark-mode .gm-style {
+    filter: brightness(0.8) invert(1) contrast(3) hue-rotate(200deg) saturate(0.3) brightness(0.7);
+}
+
+/* Dark mode toggle button */
+.dark-mode-toggle {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #333;
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    transition: background-color 0.3s;
+}
+
+.dark-mode-toggle:hover {
+    background-color: #555;
+}
+
+.dark-mode .dark-mode-toggle {
+    background-color: #eee;
+    color: #333;
+}
+
+.dark-mode .dark-mode-toggle:hover {
+    background-color: #ddd;
+}

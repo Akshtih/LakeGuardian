@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}Report Pollution - LakeGuardian{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Report Lake Pollution</h1>
+<p>Help us monitor lake health by reporting pollution incidents.</p>
+
+<div class="card">
+    <div class="card-header bg-warning text-dark">
+        <h5 class="mb-0">Pollution Report Form</h5>
+    </div>
+    <div class="card-body">
+        <form method="POST">
+            <div class="mb-3">
+                <label for="lake_id" class="form-label">Select Lake</label>
+                <select class="form-select" id="lake_id" name="lake_id" required>
+                    <option value="" selected disabled>Choose a lake...</option>
+                    {% for lake in lakes %}
+                        <option value="{{ lake.id }}" {% if request.args.get('lake_id') == lake.id %}selected{% endif %}>
+                            {{ lake.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="mb-3">
+                <label for="pollution_level" class="form-label">Pollution Level</label>
+                <select class="form-select" id="pollution_level" name="pollution_level" required>
+                    <option value="" selected disabled>Select pollution level...</option>
+                    <option value="Low">Low - Some litter, easily cleanable</option>
+                    <option value="Medium">Medium - Noticeable pollution, requires effort</option>
+                    <option value="High">High - Significant pollution, urgent action needed</option>
+                </select>
+            </div>
+            
+            <div class="mb-3">
+                <label for="description" class="form-label">Description</label>
+                <textarea class="form-control" id="description" name="description" rows="4" placeholder="Describe the pollution you observed (types of waste, amount, location details, etc.)" required></textarea>
+            </div>
+            
+            <div class="d-grid">
+                <button type="submit" class="btn btn-primary">Submit Report</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card mt-4">
+    <div class="card-header bg-info text-white">
+        <h5 class="mb-0">Reporting Guidelines</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-4">
+                <h6>What to Include</h6>
+                <ul>
+                    <li>Types of waste observed</li>
+                    <li>Approximate amount of pollution</li>
+                    <li>Specific location details</li>
+                    <li>Any wildlife impacts</li>
+                </ul>
+            </div>
+            <div class="col-md-4">
+                <h6>Pollution Level Guide</h6>
+                <ul>
+                    <li><strong>Low:</strong> Few pieces of litter</li>
+                    <li><strong>Medium:</strong> Concentrated garbage</li>
+                    <li><strong>High:</strong> Large amounts or hazardous waste</li>
+                </ul>
+            </div>
+            <div class="col-md-4">
+                <h6>Next Steps</h6>
+                <p>After reporting, your submission will be reviewed and added to our lake health monitoring system. Thank you for helping keep our lakes clean!</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

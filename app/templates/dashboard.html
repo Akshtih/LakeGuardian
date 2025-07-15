@@ -1,0 +1,233 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - LakeGuardian{% endblock %}
+
+{% block head %}
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ config['GOOGLE_MAPS_API_KEY'] }}&callback=initMap" async defer></script>
+{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Lakes Dashboard</h1>
+<p>Welcome, {{ current_user.display_name }}! View and monitor lakes in your area.</p>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">Lake Map</h5>
+            </div>
+            <div class="card-body p-0">
+                <div id="map" style="height: 500px;"></div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">Lakes in Your Area</h5>
+            </div>
+            <div class="card-body">
+                <div class="list-group">
+                    {% for lake in lakes %}
+                    <a href="{{ url_for('lake_detail', lake_id=lake.id) }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        {{ lake.name }}
+                        <span class="badge bg-{{ 'success' if lake.health_index >= 70 else 'warning' if lake.health_index >= 50 else 'danger' }} rounded-pill">
+                            Health: {{ lake.health_index }}/100
+                        </span>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mt-4">
+            <div class="card-header bg-success text-white">
+                <h5 class="card-title mb-0">Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('events') }}" class="btn btn-outline-primary">Join a Cleanup Event</a>
+                    <a href="{{ url_for('report') }}" class="btn btn-outline-warning">Report Lake Pollution</a>
+                    <a href="{{ url_for('education') }}" class="btn btn-outline-info">Get Conservation Tips</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Store lake data from backend
+    const lakes = {{ lakes|tojson }};
+    let map;
+    
+    function initMap() {
+        // Find center point from lakes (or default to a location)
+        let centerLat = 12.9716;
+        let centerLng = 77.5946;
+        
+        if (lakes.length > 0) {
+            // Use first lake as center if available
+            centerLat = lakes[0].location._latitude || lakes[0].location.latitude;
+            centerLng = lakes[0].location._longitude || lakes[0].location.longitude;
+        }
+        
+        // Create map centered at the average location
+        map = new google.maps.Map(document.getElementById("map"), {
+            center: { lat: centerLat, lng: centerLng },
+            zoom: 12,
+            mapTypeId: "hybrid"
+        });
+        
+        // Add markers for each lake
+        lakes.forEach(lake => {
+            const location = {
+                lat: lake.location._latitude || lake.location.latitude,
+                lng: lake.location._longitude || lake.location.longitude
+            };
+            
+            // Set color based on health index
+            let markerColor = "green";
+            if (lake.health_index < 50) markerColor = "red";
+            else if (lake.health_index < 70) markerColor = "yellow";
+            
+            // Create marker
+            const marker = new google.maps.Marker({
+                position: location,
+                map: map,
+                title: lake.name,
+                icon: {
+                    url: `http://maps.google.com/mapfiles/ms/icons/${markerColor}-dot.png`
+                }
+            });
+            
+            // Create info window
+            const infoContent = `
+                <div style="min-width: 200px;">
+                    <h5>${lake.name}</h5>
+                    <p>${lake.description}</p>
+                    <p><strong>Health Index:</strong> ${lake.health_index}/100</p>
+                    <p><strong>Area:</strong> ${lake.area} km²</p>
+                    <p><strong>Common Pollutants:</strong> ${lake.common_pollutants.join(', ')}</p>
+                    <a href="/lake/${lake.id}" class="btn btn-sm btn-primary">View Details</a>
+                </div>
+            `;
+            
+            const infoWindow = new google.maps.InfoWindow({
+                content: infoContent
+            });
+            
+            // Add click event to marker
+            marker.addListener("click", () => {
+                infoWindow.open(map, marker);
+            });
+        });
+        
+        // Apply dark/light mode to map if needed
+        updateMapStyle();
+    }
+    
+    // Function to update map style based on dark mode
+    function updateMapStyle() {
+        if (!map) return;
+        
+        const isDarkMode = document.body.classList.contains('dark-mode');
+        const styles = isDarkMode ? [
+            { elementType: "geometry", stylers: [{ color: "#242f3e" }] },
+            { elementType: "labels.text.stroke", stylers: [{ color: "#242f3e" }] },
+            { elementType: "labels.text.fill", stylers: [{ color: "#746855" }] },
+            {
+                featureType: "administrative.locality",
+                elementType: "labels.text.fill",
+                stylers: [{ color: "#d59563" }],
+            },
+            {
+                featureType: "poi",
+                elementType: "labels.text.fill",
+                stylers: [{ color: "#d59563" }],
+            },
+            {
+                featureType: "poi.park",
+                elementType: "geometry",
+                stylers: [{ color: "#263c3f" }],
+            },
+            {
+                featureType: "poi.park",
+                elementType: "labels.text.fill",
+                stylers: [{ color: "#6b9a76" }],
+            },
+            {
+                featureType: "road",
+                elementType: "geometry",
+                stylers: [{ color: "#38414e" }],
+            },
+            {
+                featureType: "road",
+                elementType: "geometry.stroke",
+                stylers: [{ color: "#212a37" }],
+            },
+            {
+                featureType: "road",
+                elementType: "labels.text.fill",
+                stylers: [{ color: "#9ca5b3" }],
+            },
+            {
+                featureType: "road.highway",
+                elementType: "geometry",
+                stylers: [{ color: "#746855" }],
+            },
+            {
+                featureType: "road.highway",
+                elementType: "geometry.stroke",
+                stylers: [{ color: "#1f2835" }],
+            },
+            {
+                featureType: "road.highway",
+                elementType: "labels.text.fill",
+                stylers: [{ color: "#f3d19c" }],
+            },
+            {
+                featureType: "transit",
+                elementType: "geometry",
+                stylers: [{ color: "#2f3948" }],
+            },
+            {
+                featureType: "transit.station",
+                elementType: "labels.text.fill",
+                stylers: [{ color: "#d59563" }],
+            },
+            {
+                featureType: "water",
+                elementType: "geometry",
+                stylers: [{ color: "#17263c" }],
+            },
+            {
+                featureType: "water",
+                elementType: "labels.text.fill",
+                stylers: [{ color: "#515c6d" }],
+            },
+            {
+                featureType: "water",
+                elementType: "labels.text.stroke",
+                stylers: [{ color: "#17263c" }],
+            },
+        ] : [];
+        
+        map.setOptions({ styles: styles });
+    }
+    
+    // Listen for dark mode changes
+    document.addEventListener('DOMContentLoaded', function() {
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        
+        if (darkModeToggle) {
+            darkModeToggle.addEventListener('click', function() {
+                // Give the DOM time to update classes
+                setTimeout(updateMapStyle, 100);
+            });
+        }
+    });
+</script>
+{% endblock %}

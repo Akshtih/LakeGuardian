@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}LakeGuardian - Protect Our Lake Ecosystem{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto text-center">
+        <h1 class="display-4 mb-4">LakeGuardian</h1>
+        <p class="lead mb-5">Protecting our college lakes through community action and technology</p>
+        
+        {% if current_user.is_authenticated %}
+            <div class="d-grid gap-3 d-sm-flex justify-content-sm-center">
+                <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-lg px-4 gap-3">Go to Dashboard</a>
+                <a href="{{ url_for('education') }}" class="btn btn-outline-secondary btn-lg px-4">Learn More</a>
+            </div>
+        {% else %}
+            <div class="d-grid gap-3 d-sm-flex justify-content-sm-center">
+                <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg px-4 gap-3">Get Started</a>
+                <a href="{{ url_for('login') }}" class="btn btn-outline-secondary btn-lg px-4">Login</a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <h5 class="card-title">Monitor Lake Health</h5>
+                <p class="card-text">Track the health of lakes in your area and view pollution reports.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <h5 class="card-title">Join Cleanup Events</h5>
+                <p class="card-text">Participate in community cleanup events to restore our water bodies.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <h5 class="card-title">Get Conservation Tips</h5>
+                <p class="card-text">Learn how you can help protect lakes with our AI-powered assistant.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

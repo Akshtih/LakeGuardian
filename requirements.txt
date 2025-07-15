@@ -1,0 +1,9 @@
+flask
+firebase-admin
+google-cloud-storage
+python-dotenv
+Pillow
+requests
+flask-login
+flask-wtf
+gunicorn
